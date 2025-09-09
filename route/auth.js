@@ -38,7 +38,11 @@ router.get(
     passport.authenticate("google", { scope: ["profile", "email"] })
 );
 router.get("/logout", (req, res) => {
-    req.logout();
-    res.redirect(process.env.CLIENT_URL);
+    req.logout((err) => {
+        if (err) {
+            return res.status(500).json({ message: "Logout failed" });
+        }
+        res.redirect(process.env.CLIENT_URL);
+    });
 });
 module.exports = router;
