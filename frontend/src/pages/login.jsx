@@ -1,16 +1,44 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
+import axios from "axios";
 
-export default function LoginForm() {
+export default function Login() {
+  const navigate = useNavigate();
+
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    const loginData = {
+      email: e.target.email.value,
+      password: e.target.passw.value,
+    };
+
+    try {
+      const res = await axios.post(
+        "http://localhost:8080/auth/login",
+        loginData,
+        { withCredentials: true }
+      );
+
+      console.log("Login success", res.data);
+      navigate("/");
+    } catch (err) {
+      console.error("Login failed", err.response?.data || err.message);
+      alert(err.response?.data?.message || "Login failed. Please try again.");
+    }
+  };
+
   const googleAuth = () => {
     // Start OAuth at /auth/google
-    window.open(`${import.meta.env.VITE_API_URL}/auth/google`, "_self");
+    window.open(
+      `${import.meta.env.VITE_API_URL}/auth/google/callback`,
+      "_self"
+    );
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-blue-50">
-      <div className="bg-white shadow-lg rounded-2xl p-8 w-full max-w-5xl flex flex-col md:flex-row">
-        <div className="hidden md:flex w-1/2 justify-center items-center">
+    <div className="flex items-center justify-center min-h-screen bg-blue-50">
+      <div className="flex flex-col w-full max-w-5xl p-8 bg-white shadow-lg rounded-2xl md:flex-row">
+        <div className="items-center justify-center hidden w-1/2 md:flex">
           <img
             src="https://cdni.iconscout.com/illustration/premium/thumb/woman-using-mobile-login-screen-illustration-download-in-svg-png-gif-file-formats--sign-cellphone-signup-application-pack-business-illustrations-5590722.png?f=webp"
             alt="login illustration"
@@ -18,26 +46,28 @@ export default function LoginForm() {
           />
         </div>
 
-        <div className="w-full md:w-1/2 flex flex-col justify-center px-6">
-          <h2 className="text-2xl font-bold text-center mb-6">Log in Form</h2>
-          <h3 className="text-lg font-semibold mb-4 text-center">
+        <div className="flex flex-col justify-center w-full px-6 md:w-1/2">
+          <h2 className="mb-6 text-2xl font-bold text-center">Log in Form</h2>
+          <h3 className="mb-4 text-lg font-semibold text-center">
             Members Log in
           </h3>
 
-          <form className="flex flex-col gap-4">
+          <form className="flex flex-col gap-4" onSubmit={handleLogin}>
             <input
               type="email"
+              name="email"
               placeholder="Email"
               className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400"
             />
             <input
               type="password"
               placeholder="Password"
+              name="passw"
               className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400"
             />
             <button
               type="submit"
-              className="w-full bg-yellow-400 text-white font-semibold py-2 rounded-lg hover:bg-yellow-500 transition"
+              className="w-full py-2 font-semibold text-white transition bg-yellow-400 rounded-lg hover:bg-yellow-500"
             >
               Log In
             </button>
@@ -45,13 +75,13 @@ export default function LoginForm() {
 
           <div className="flex items-center my-4">
             <hr className="flex-grow border-gray-300" />
-            <span className="px-2 text-gray-500 text-sm">or</span>
+            <span className="px-2 text-sm text-gray-500">or</span>
             <hr className="flex-grow border-gray-300" />
           </div>
 
           <button
             onClick={googleAuth}
-            className="w-full flex items-center justify-center border border-gray-300 py-2 rounded-lg hover:bg-gray-100 transition"
+            className="flex items-center justify-center w-full py-2 transition border border-gray-300 rounded-lg hover:bg-gray-100"
           >
             <img
               src="https://www.svgrepo.com/show/355037/google.svg"
@@ -61,11 +91,11 @@ export default function LoginForm() {
             Sign in with Google
           </button>
 
-          <p className="text-center text-sm text-gray-600 mt-4">
+          <p className="mt-4 text-sm text-center text-gray-600">
             New Here?{" "}
             <Link
               to="/register"
-              className="text-yellow-500 hover:text-yellow-600 font-semibold"
+              className="font-semibold text-yellow-500 hover:text-yellow-600"
             >
               Sign Up
             </Link>
